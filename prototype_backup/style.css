@@ -1,0 +1,66 @@
+#voice-control-button {
+
+    position: fixed;
+
+    bottom: 90px;
+
+    right: 25px;
+
+    z-index: 999999;
+
+    padding: 12px 18px;
+
+    border: none;
+
+    border-radius: 25px;
+
+    background: #222;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+
+#voice-control-button:hover {
+
+    background: #444;
+}
+
+
+#voice-control-button.active {
+
+    background: #d00;
+}
+
+
+#voice-message {
+
+    position: fixed;
+
+    top: 80px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 999999;
+
+    background: rgba(0,0,0,0.85);
+
+    color: white;
+
+    padding: 15px 25px;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}

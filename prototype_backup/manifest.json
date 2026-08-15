@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Voice Control",
+  "version": "1.0",
+  "description": "Control YouTube videos using voice commands.",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}

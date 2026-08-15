@@ -1,0 +1,116 @@
+/* Hey YouTube — Unobtrusive Floating Status Pill */
+
+#hey-youtube-overlay-root {
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 9999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hy-pill-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(18, 18, 22, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 30px;
+  padding: 8px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: #f0f0f5;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  min-height: 36px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hy-pill-container:hover {
+  background: rgba(26, 26, 32, 0.95);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+}
+
+/* Status Indicator Dot */
+.hy-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* State Classes */
+.hy-status-waiting .hy-status-dot {
+  background-color: #10b981; /* Emerald Green */
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.hy-status-listening .hy-status-dot {
+  background-color: #f59e0b; /* Amber */
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+  animation: hy-pulse 1.2s infinite ease-in-out;
+}
+
+.hy-status-processing .hy-status-dot {
+  background-color: #3b82f6; /* Blue */
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+  animation: hy-pulse 0.8s infinite ease-in-out;
+}
+
+.hy-status-executed .hy-status-dot {
+  background-color: #06b6d4; /* Cyan */
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.9);
+}
+
+.hy-status-paused .hy-status-dot {
+  background-color: #6b7280; /* Gray */
+  box-shadow: none;
+}
+
+.hy-status-disconnected .hy-status-dot {
+  background-color: #ef4444; /* Red */
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Text label */
+.hy-status-text {
+  white-space: nowrap;
+  color: #e5e7eb;
+}
+
+.hy-highlight-cmd {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* Mute/Pause Toggle Button */
+.hy-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.hy-toggle-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes hy-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1.0; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}

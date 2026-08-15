@@ -1,0 +1,9 @@
+# Core Local Voice Engine Dependencies
+openwakeword>=0.6.0
+sounddevice>=0.5.5
+numpy>=1.26.0
+onnxruntime>=1.18.0
+faster-whisper>=1.0.0
+scipy>=1.13.0
+websockets>=13.0.0
+onnx>=1.16.0

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Hey YouTube — Voice Controller",
+  "version": "2.0.0",
+  "description": "Hands-free, privacy-first local voice control for YouTube video playback.",
+  "permissions": ["storage"],
+  "host_permissions": ["*://www.youtube.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["ui/overlay.js", "content.js"],
+      "css": ["ui/overlay.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
