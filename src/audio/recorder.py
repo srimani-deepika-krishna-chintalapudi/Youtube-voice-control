@@ -135,31 +135,93 @@ class AudioRecorder:
         except queue.Empty:
             return None
 
-    def record_command(self, duration_sec: float) -> np.ndarray:
+    def record_command(
+        self,
+        max_duration_sec: float = 5.0,
+        silence_duration_sec: float = 0.9,
+        min_speech_duration_sec: float = 0.15,
+    ) -> np.ndarray:
         """
-        Collects continuous audio for duration_sec (for STT).
-        Includes the most recent ~0.4s from ring buffer to capture seamless one-breath commands.
+        Records one spoken command and automatically stops after silence.
+
+        Flow:
+            wake word
+            -> wait for speech
+            -> record speech
+            -> stop after silence
+            -> return audio
         """
-        num_chunks = int(duration_sec * self.sample_rate / self.chunk_size)
+
+        max_chunks = int(max_duration_sec * self.sample_rate / self.chunk_size)
+        silence_chunks = max(
+            1,
+            int(silence_duration_sec * self.sample_rate / self.chunk_size)
+        )
+        min_speech_chunks = max(
+            1,
+            int(min_speech_duration_sec * self.sample_rate / self.chunk_size)
+        )
+
         chunks = []
-        
-        # Prepend last 5 chunks (~400ms) from ring buffer
+        speech_started = False
+        silent_count = 0
+
+        # Keep a small amount of audio immediately before the command.
+        recent_chunks = list(self.ring_buffer)[-5:]
+        chunks.extend(recent_chunks)
+
+        # Clear stale wake-word chunks.
         with self.chunk_queue.mutex:
-            recent_chunks = list(self.ring_buffer)[-5:] if len(self.ring_buffer) >= 5 else list(self.ring_buffer)
-            chunks.extend(recent_chunks)
             self.chunk_queue.queue.clear()
 
-        remaining_chunks = max(0, num_chunks - len(chunks))
-        for _ in range(remaining_chunks):
-            chunk = self.get_chunk(timeout=1.0)
-            if chunk is not None:
-                chunks.append(chunk)
-            else:
-                break
+        logger.info("Listening for command...")
 
-        if chunks:
-            return np.concatenate(chunks)
-        return np.array([], dtype=np.int16)
+        for _ in range(max_chunks):
+
+            chunk = self.get_chunk(timeout=1.0)
+
+            if chunk is None:
+                continue
+
+            rms = self.calculate_rms(chunk)
+
+            # Adjust this if your microphone is particularly quiet/loud.
+            SPEECH_RMS_THRESHOLD = 500
+
+            if rms >= SPEECH_RMS_THRESHOLD:
+                speech_started = True
+                silent_count = 0
+                chunks.append(chunk)
+
+            elif speech_started:
+                # User has started speaking, so silence now matters.
+                chunks.append(chunk)
+                silent_count += 1
+
+                if silent_count >= silence_chunks:
+                    logger.info("End of command detected.")
+                    break
+
+            else:
+                # Don't accumulate unlimited silence before speech starts.
+                continue
+
+        if not speech_started:
+            logger.info("No speech detected.")
+            return np.array([], dtype=np.int16)
+
+        # Remove excessive trailing silence.
+        if silent_count > 0:
+            chunks = chunks[:-silent_count]
+
+        audio = np.concatenate(chunks)
+
+        logger.info(
+            "Command recording complete: %.2f seconds",
+            len(audio) / self.sample_rate
+        )
+
+        return audio
 
     @staticmethod
     def calculate_rms(chunk: np.ndarray) -> float:

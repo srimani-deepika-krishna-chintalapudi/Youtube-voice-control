@@ -98,7 +98,10 @@ class VoiceControllerStateMachine:
                 # STATE 3: LISTENING_FOR_COMMAND
                 # ========================================================
                 self._set_state(ControllerState.LISTENING_FOR_COMMAND)
-                audio_command = self.recorder.record_command(duration_sec=COMMAND_RECORD_SECONDS)
+                audio_command = self.recorder.record_command(
+                    max_duration_sec=5.0,
+                    silence_duration_sec=0.9,
+                )
 
                 # ========================================================
                 # STATE 4: PROCESSING_COMMAND

@@ -1,12 +1,28 @@
+# Virtual environments
 venv/
+.venv/
+training_venv/
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+
+# Audio / logs
 *.wav
 *.mp3
 *.log
+
+# Environment variables
 .env
 
 # Local ML models
 models/*
 !models/.gitkeep
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
