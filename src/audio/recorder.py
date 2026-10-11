@@ -16,6 +16,7 @@ from src.config import (
     AUDIO_DTYPE,
     MIC_DEVICE_INDEX,
     BUFFER_MAX_SECONDS,
+    SPEECH_RMS_THRESHOLD,
 )
 
 logger = logging.getLogger(__name__)
@@ -167,13 +168,11 @@ class AudioRecorder:
         silent_count = 0
 
         # Keep a small amount of audio immediately before the command.
-        recent_chunks = list(self.ring_buffer)[-5:]
+        recent_chunks = list(self.ring_buffer)[-2:]
         chunks.extend(recent_chunks)
 
         # Clear stale wake-word chunks.
-        with self.chunk_queue.mutex:
-            self.chunk_queue.queue.clear()
-
+        self.clear_queue()
         logger.info("Listening for command...")
 
         for _ in range(max_chunks):
@@ -186,8 +185,7 @@ class AudioRecorder:
             rms = self.calculate_rms(chunk)
 
             # Adjust this if your microphone is particularly quiet/loud.
-            SPEECH_RMS_THRESHOLD = 500
-
+            
             if rms >= SPEECH_RMS_THRESHOLD:
                 speech_started = True
                 silent_count = 0
@@ -233,3 +231,11 @@ class AudioRecorder:
     @property
     def is_running(self) -> bool:
         return self._is_running
+
+    def clear_queue(self):
+        """Clears pending audio chunks from the processing queue."""
+        while True:
+            try:
+                self.chunk_queue.get_nowait()
+            except queue.Empty:
+                break

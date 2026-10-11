@@ -7,9 +7,9 @@ import logging
 import threading
 from enum import Enum
 from typing import Optional
-
 from src.config import (
     COMMAND_RECORD_SECONDS,
+    COMMAND_SILENCE_TIMEOUT,
     WAKE_WORD_THRESHOLD,
 )
 from src.audio.recorder import AudioRecorder
@@ -99,8 +99,8 @@ class VoiceControllerStateMachine:
                 # ========================================================
                 self._set_state(ControllerState.LISTENING_FOR_COMMAND)
                 audio_command = self.recorder.record_command(
-                    max_duration_sec=5.0,
-                    silence_duration_sec=0.9,
+                    max_duration_sec=COMMAND_RECORD_SECONDS,
+                    silence_duration_sec=COMMAND_SILENCE_TIMEOUT,
                 )
 
                 # ========================================================
@@ -158,8 +158,23 @@ class VoiceControllerStateMachine:
         self._worker_thread.start()
 
     def stop(self):
-        """Stops the state machine and releases resources."""
-        self._running = False
-        if self._worker_thread:
-            self._worker_thread.join(timeout=2.0)
-        self.service.stop()
+        """Stops the microphone stream and releases resources."""
+        if not self._is_running and self.stream is None:
+            return
+
+        self._is_running = False
+
+        if self.stream is not None:
+            try:
+                self.stream.stop()
+            except Exception as e:
+                logger.warning(f"Error stopping audio stream: {e}")
+
+            try:
+                self.stream.close()
+            except Exception as e:
+                logger.warning(f"Error closing audio stream: {e}")
+
+            self.stream = None
+
+        logger.info("Microphone stream stopped.")

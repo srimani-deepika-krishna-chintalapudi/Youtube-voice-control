@@ -13,7 +13,7 @@ SAMPLE_RATE = 16000          # 16 kHz standard for openWakeWord & faster-whisper
 CHANNELS = 1                 # Mono
 CHUNK_SIZE = 1280            # 1280 samples = 80ms at 16kHz (openWakeWord native frame size)
 AUDIO_DTYPE = "int16"        # 16-bit PCM
-MIC_DEVICE_INDEX = 1         # Cirrus Logic High Definition Audio
+MIC_DEVICE_INDEX = none     # Cirrus Logic High Definition Audio
 
 # Ring Buffer Settings
 BUFFER_MAX_SECONDS = 10      # Circular buffer keeps up to 10 seconds of audio in memory
